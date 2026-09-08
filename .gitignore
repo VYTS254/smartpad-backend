@@ -1,0 +1,17 @@
+node_modules/
+.env
+logs/
+*.log
+coverage/
+.DS_Store
+firebase-service-account.json
+API_GUIDE.md
+API_STATUS.md
+DATABASE_QUICK_REFERENCE.md
+DATABASE_SCHEMA.md
+FIREBASE_SETUP.md
+JWT_CONFIGURATION_GUIDE.md
+JWT_QUICK_START.md
+POSTMAN_TESTING_GUIDE.md
+QUICK_START.md
+README.md

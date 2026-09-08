@@ -1,0 +1,340 @@
+# SmartPad Backend API Test File
+# Use with REST Client extension in VS Code or import into Postman
+
+@baseUrl = http://localhost:5000/api/v1
+@token = YOUR_FIREBASE_TOKEN_HERE
+@deviceToken = YOUR_DEVICE_TOKEN_HERE
+
+###############################################
+# AUTHENTICATION APIs
+###############################################
+
+### 1. Register New User
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123",
+  "fullName": "Test User",
+  "phone": "0712345678",
+  "school": "Nairobi University",
+  "department": "Engineering",
+  "registrationNumber": "ENG/2024/001",
+  "gender": "male",
+  "role": "student"
+}
+
+### 2. Login User
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+### 3. Logout User
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}
+
+### 4. Forgot Password
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com"
+}
+
+### 5. Verify Phone
+POST {{baseUrl}}/auth/verify-phone
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "phone": "0712345678",
+  "verificationCode": "123456"
+}
+
+### 6. Refresh Token
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "YOUR_REFRESH_TOKEN"
+}
+
+###############################################
+# USER MANAGEMENT APIs
+###############################################
+
+### 1. Get All Users (Admin only)
+GET {{baseUrl}}/users?limit=20&role=student
+Authorization: Bearer {{token}}
+
+### 2. Get User by ID
+GET {{baseUrl}}/users/USER_ID_HERE
+Authorization: Bearer {{token}}
+
+### 3. Update User
+PUT {{baseUrl}}/users/USER_ID_HERE
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "fullName": "Updated Name",
+  "phone": "0712345679",
+  "department": "Computer Science"
+}
+
+### 4. Delete User (Admin only)
+DELETE {{baseUrl}}/users/USER_ID_HERE
+Authorization: Bearer {{token}}
+
+### 5. Get Users by School
+GET {{baseUrl}}/users/school/Nairobi University?limit=50
+Authorization: Bearer {{token}}
+
+###############################################
+# DISPENSER MANAGEMENT APIs
+###############################################
+
+### 1. Get All Dispensers
+GET {{baseUrl}}/dispensers?school=Nairobi University
+Authorization: Bearer {{token}}
+
+### 2. Get Dispenser by ID
+GET {{baseUrl}}/dispensers/DISPENSER_ID_HERE
+Authorization: Bearer {{token}}
+
+### 3. Create Dispenser (Admin/School Manager)
+POST {{baseUrl}}/dispensers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "school": "Nairobi University",
+  "location": "Ladies Hostel Block A",
+  "esp32Id": "ESP32-001",
+  "initialPads": 50
+}
+
+### 4. Update Dispenser (Admin/School Manager)
+PUT {{baseUrl}}/dispensers/DISPENSER_ID_HERE
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "location": "Ladies Hostel Block B - Ground Floor",
+  "status": "MAINTENANCE"
+}
+
+### 5. Delete Dispenser (Admin only)
+DELETE {{baseUrl}}/dispensers/DISPENSER_ID_HERE
+Authorization: Bearer {{token}}
+
+### 6. Get Dispensers by School
+GET {{baseUrl}}/dispensers/school/Nairobi University
+Authorization: Bearer {{token}}
+
+### 7. Get Online Dispensers
+GET {{baseUrl}}/dispensers/status/online
+Authorization: Bearer {{token}}
+
+###############################################
+# ESP32 DEVICE APIs
+###############################################
+
+### 1. Update Device Status
+POST {{baseUrl}}/esp32/status
+X-Device-Token: {{deviceToken}}
+Content-Type: application/json
+
+{
+  "esp32Id": "ESP32-001",
+  "status": "ONLINE",
+  "batteryLevel": 85,
+  "signalStrength": 75,
+  "firmwareVersion": "1.0.0"
+}
+
+### 2. Device Heartbeat
+POST {{baseUrl}}/esp32/heartbeat
+X-Device-Token: {{deviceToken}}
+Content-Type: application/json
+
+{
+  "esp32Id": "ESP32-001",
+  "padsAvailable": 45,
+  "batteryLevel": 85,
+  "signalStrength": 75,
+  "temperature": 28.5
+}
+
+### 3. Pad Dispensed Confirmation
+POST {{baseUrl}}/esp32/pad-dispensed
+X-Device-Token: {{deviceToken}}
+Content-Type: application/json
+
+{
+  "esp32Id": "ESP32-001",
+  "transactionId": "TRANSACTION_ID_HERE",
+  "padsDispensed": 1
+}
+
+### 4. Report Device Error
+POST {{baseUrl}}/esp32/error
+X-Device-Token: {{deviceToken}}
+Content-Type: application/json
+
+{
+  "esp32Id": "ESP32-001",
+  "errorCode": "ERR_MOTOR_JAM",
+  "errorMessage": "Motor jammed during dispensing operation",
+  "severity": "ERROR"
+}
+
+###############################################
+# INVENTORY MANAGEMENT APIs
+###############################################
+
+### 1. Get All Inventory
+GET {{baseUrl}}/inventory?status=LOW
+Authorization: Bearer {{token}}
+
+### 2. Refill Inventory
+POST {{baseUrl}}/inventory/refill
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "dispenserId": "DISPENSER_ID_HERE",
+  "padsAdded": 50
+}
+
+### 3. Update Inventory Settings
+PUT {{baseUrl}}/inventory/update
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "inventoryId": "INVENTORY_ID_HERE",
+  "threshold": 15
+}
+
+### 4. Get Low Stock Inventory
+GET {{baseUrl}}/inventory/low-stock
+Authorization: Bearer {{token}}
+
+### 5. Get Inventory by Dispenser
+GET {{baseUrl}}/inventory/dispenser/DISPENSER_ID_HERE
+Authorization: Bearer {{token}}
+
+###############################################
+# PAYMENT APIs
+###############################################
+
+### 1. Initiate M-Pesa STK Push
+POST {{baseUrl}}/payment/stkpush
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "phone": "254712345678",
+  "amount": 10,
+  "dispenserId": "DISPENSER_ID_HERE"
+}
+
+### 2. M-Pesa Callback (Called by M-Pesa, not manually)
+POST {{baseUrl}}/payment/callback
+Content-Type: application/json
+
+{
+  "Body": {
+    "stkCallback": {
+      "MerchantRequestID": "29115-34620561-1",
+      "CheckoutRequestID": "ws_CO_191220191020363925",
+      "ResultCode": 0,
+      "ResultDesc": "The service request is processed successfully.",
+      "CallbackMetadata": {
+        "Item": [
+          {
+            "Name": "Amount",
+            "Value": 10
+          },
+          {
+            "Name": "MpesaReceiptNumber",
+            "Value": "NLJ7RT61SV"
+          },
+          {
+            "Name": "TransactionDate",
+            "Value": 20191219102115
+          },
+          {
+            "Name": "PhoneNumber",
+            "Value": 254712345678
+          }
+        ]
+      }
+    }
+  }
+}
+
+### 3. Check Payment Status
+GET {{baseUrl}}/payment/status/CHECKOUT_REQUEST_ID_HERE
+Authorization: Bearer {{token}}
+
+###############################################
+# TRANSACTION APIs
+###############################################
+
+### 1. Get All Transactions
+GET {{baseUrl}}/transactions?limit=50&status=COMPLETED
+Authorization: Bearer {{token}}
+
+### 2. Get Transaction by ID
+GET {{baseUrl}}/transactions/TRANSACTION_ID_HERE
+Authorization: Bearer {{token}}
+
+### 3. Get User Transactions
+GET {{baseUrl}}/transactions/user/USER_ID_HERE?limit=20
+Authorization: Bearer {{token}}
+
+### 4. Get Dispenser Transactions
+GET {{baseUrl}}/transactions/dispenser/DISPENSER_ID_HERE?limit=50
+Authorization: Bearer {{token}}
+
+###############################################
+# REPORTING APIs
+###############################################
+
+### 1. Daily Report
+GET {{baseUrl}}/reports/daily?startDate=2024-01-15&endDate=2024-01-15
+Authorization: Bearer {{token}}
+
+### 2. Weekly Report
+GET {{baseUrl}}/reports/weekly
+Authorization: Bearer {{token}}
+
+### 3. Monthly Report
+GET {{baseUrl}}/reports/monthly
+Authorization: Bearer {{token}}
+
+### 4. School Report
+GET {{baseUrl}}/reports/school/Nairobi University?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer {{token}}
+
+### 5. Dispenser Report
+GET {{baseUrl}}/reports/dispenser/DISPENSER_ID_HERE
+Authorization: Bearer {{token}}
+
+### 6. Revenue Report
+GET {{baseUrl}}/reports/revenue?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer {{token}}
+
+###############################################
+# HEALTH CHECK
+###############################################
+
+### Health Check (No authentication required)
+GET http://localhost:5000/health
